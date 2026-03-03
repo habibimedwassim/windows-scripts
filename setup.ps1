@@ -76,7 +76,7 @@ function Get-Script {
 # Needed for apps that are Store-only: Xbox Game Bar, etc.
 Write-Host ""
 Write-Host "  Enable Microsoft Store?" -ForegroundColor Yellow
-Write-Host "  Required for: Xbox Game Bar and other Store-only packages." -ForegroundColor DarkGray
+Write-Host "  Required for Store-only packages (e.g. some fonts, optional components)." -ForegroundColor DarkGray
 Write-Host "  (uses wsreset -i - pulls from the Windows Component Store, no ISO needed)" -ForegroundColor DarkGray
 $storeChoice = Read-Host "  Install Store? [y/N]"
 if ($storeChoice -match '^[Yy]') {
@@ -148,7 +148,12 @@ Write-Host "  ══════════════════════
 Write-Host ""
 Write-Host "  Next step: open a NORMAL (non-admin) PowerShell window and run:" -ForegroundColor Yellow
 Write-Host ""
-Write-Host "    .\scripts\Install-Dev.ps1" -ForegroundColor Cyan
+if ($runFromWeb) {
+    Write-Host "    Set-ExecutionPolicy Bypass -Scope Process -Force" -ForegroundColor Cyan
+    Write-Host "    irm https://raw.githubusercontent.com/habibimedwassim/windows-scripts/main/scripts/Install-Dev.ps1 | iex" -ForegroundColor Cyan
+} else {
+    Write-Host "    .\scripts\Install-Dev.ps1" -ForegroundColor Cyan
+}
 Write-Host ""
 Write-Host "  This installs PS7 (interactive - opt out of telemetry/WU updates)," -ForegroundColor DarkGray
 Write-Host "  Windows Terminal, eza, Starship, and your PowerShell profile." -ForegroundColor DarkGray

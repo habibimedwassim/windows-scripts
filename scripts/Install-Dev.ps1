@@ -64,17 +64,30 @@ winget @wingetBase --id Starship.Starship --silent
 Write-Header "PowerShell Profile"
 # ════════════════════════════════════════════════════════════════════════════════
 
-$repoRoot   = Split-Path -Parent $PSScriptRoot
-$srcProfile = Join-Path $repoRoot 'profile\Microsoft.PowerShell_profile.ps1'
+# Use the shell-resolved Documents folder so redirected/OneDrive paths work correctly
+$myDocs     = [System.Environment]::GetFolderPath('MyDocuments')
+$ps7Profile = "$myDocs\PowerShell\Microsoft.PowerShell_profile.ps1"
+$ps5Profile = "$myDocs\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
 
-if (-not (Test-Path $srcProfile)) {
-    Write-Warn "Profile not found at: $srcProfile"
-    Write-Warn "If you ran via irm|iex, clone the repo and copy profile\ manually."
+$runFromWeb = ($PSScriptRoot -eq '' -or $null -eq $PSScriptRoot)
+
+if ($runFromWeb) {
+    # Running via irm | iex – download the profile directly from the repo
+    $profileUrl = 'https://raw.githubusercontent.com/habibimedwassim/windows-scripts/main/profile/Microsoft.PowerShell_profile.ps1'
+    $tmpProfile = "$env:TEMP\Microsoft.PowerShell_profile.ps1"
+    Write-Step "Downloading PowerShell profile from GitHub..."
+    Invoke-WebRequest $profileUrl -OutFile $tmpProfile
+    $srcProfile = $tmpProfile
 } else {
-    # Write to both PS7 and Windows PowerShell 5 profile locations
-    $ps7Profile = "$env:USERPROFILE\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
-    $ps5Profile = "$env:USERPROFILE\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+    $repoRoot   = Split-Path -Parent $PSScriptRoot
+    $srcProfile = Join-Path $repoRoot 'profile\Microsoft.PowerShell_profile.ps1'
+    if (-not (Test-Path $srcProfile)) {
+        Write-Warn "Profile not found at: $srcProfile"
+        $srcProfile = $null
+    }
+}
 
+if ($srcProfile) {
     foreach ($dest in @($ps7Profile, $ps5Profile)) {
         $destDir = Split-Path $dest
         if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }

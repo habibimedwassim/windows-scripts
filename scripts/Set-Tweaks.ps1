@@ -8,8 +8,9 @@
 #   4. Disable sticky/filter/toggle keys prompts
 #   5. Disable mouse enhance pointer precision (acceleration)
 #   6. Disable Game DVR / background recording
-#   7. Enable Hardware-Accelerated GPU Scheduling (HAGS)
-#   8. Set power plan to High Performance
+#   7. Disable Xbox Game Bar (suppresses ms-gamingoverlay popup)
+#   8. Enable Hardware-Accelerated GPU Scheduling (HAGS)
+#   9. Set power plan to High Performance
 
 #Requires -RunAsAdministrator
 
@@ -81,17 +82,41 @@ Write-Header "Game DVR - Disable Background Recording"
 
 # Xbox Game Bar background recording (Game DVR) consumes CPU and GPU even when
 # you are not actively recording. Disable it for a clean baseline.
-# Note: if you want to USE Game Bar captures, comment these lines out.
 $gameDVRUser = 'HKCU:\System\GameConfigStore'
 Ensure-Key $gameDVRUser
-Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_Enabled'             -Value 0 -Type DWord
-Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_FSEBehaviorMode'     -Value 2 -Type DWord
+Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_Enabled'              -Value 0 -Type DWord
+Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_FSEBehaviorMode'      -Value 2 -Type DWord
 Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_HonorUserFSEBehavior' -Value 1 -Type DWord
+
+$gameDVRCapture = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR'
+Ensure-Key $gameDVRCapture
+Set-ItemProperty -Path $gameDVRCapture -Name 'AppCaptureEnabled' -Value 0 -Type DWord
 
 $gameDVRPolicy = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR'
 Ensure-Key $gameDVRPolicy
 Set-ItemProperty -Path $gameDVRPolicy -Name 'AllowGameDVR' -Value 0 -Type DWord
 Write-Ok "Game DVR background recording disabled."
+
+# ════════════════════════════════════════════════════════════════════════════════
+Write-Header "Xbox Game Bar - Disable (suppress ms-gamingoverlay popup)"
+# ════════════════════════════════════════════════════════════════════════════════
+
+# When Xbox Game Bar is not installed, Windows still tries to launch it via the
+# ms-gamingoverlay URI scheme (triggered by Win+G or game start hooks), causing
+# an annoying "Try the new Xbox app" popup.  Disabling these registry keys
+# prevents the popup from appearing entirely.
+$gameBarKey = 'HKCU:\Software\Microsoft\GameBar'
+Ensure-Key $gameBarKey
+Set-ItemProperty -Path $gameBarKey -Name 'ShowStartupPanel'    -Value 0 -Type DWord
+Set-ItemProperty -Path $gameBarKey -Name 'AutoGameModeEnabled'  -Value 0 -Type DWord
+Set-ItemProperty -Path $gameBarKey -Name 'AllowAutoGameMode'    -Value 0 -Type DWord
+
+# Also block the Game Bar via policy (machine-wide)
+$gameBarPolicy = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR'
+Ensure-Key $gameBarPolicy
+Set-ItemProperty -Path $gameBarPolicy -Name 'AllowGameDVR' -Value 0 -Type DWord
+
+Write-Ok "Xbox Game Bar disabled (ms-gamingoverlay popup suppressed)."
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Header "Hardware-Accelerated GPU Scheduling (HAGS)"
