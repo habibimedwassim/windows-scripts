@@ -68,17 +68,17 @@ $dotnetRuntimes = @(
 
 foreach ($id in $dotnetRuntimes) { wgi $id }
 
-# ════════════════════════════════════════════════════════════════════════════════
-Write-Header ".NET Framework 3.5  (DISM)"
-# ════════════════════════════════════════════════════════════════════════════════
+# # ════════════════════════════════════════════════════════════════════════════════
+# Write-Header ".NET Framework 3.5  (DISM)"
+# # ════════════════════════════════════════════════════════════════════════════════
 
-Write-Step "Enabling .NET Framework 3.5 via DISM..."
-$result = dism /online /enable-feature /featurename:NetFx3 /all /norestart 2>&1
-if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 3010) {
-    Write-Ok ".NET Framework 3.5 enabled (reboot may be required)."
-} else {
-    Write-Warn ".NET Framework 3.5 DISM exited with code $LASTEXITCODE - it may already be enabled."
-}
+# Write-Step "Enabling .NET Framework 3.5 via DISM..."
+# $result = dism /online /enable-feature /featurename:NetFx3 /all /norestart 2>&1
+# if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 3010) {
+#     Write-Ok ".NET Framework 3.5 enabled (reboot may be required)."
+# } else {
+#     Write-Warn ".NET Framework 3.5 DISM exited with code $LASTEXITCODE - it may already be enabled."
+# }
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Header "Windows App Runtime & WebView2"
