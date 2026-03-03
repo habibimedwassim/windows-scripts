@@ -100,20 +100,20 @@ Write-Header "OpenAL"
 # Required by many games: Source engine titles, id Tech games, Unity games, etc.
 wgi 'OpenAL.OpenAL'
 
-# ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Xbox Game Bar  (9NZKPSTSNW4P)"
-# ════════════════════════════════════════════════════════════════════════════════
+# # ════════════════════════════════════════════════════════════════════════════════
+# Write-Header "Xbox Game Bar  (9NZKPSTSNW4P)"
+# # ════════════════════════════════════════════════════════════════════════════════
 
-# Game Bar is stripped from LTSC. It provides the gaming overlay (FPS counter,
-# screen capture, performance widgets) and is required by some games/launchers.
-# It lives in the MS Store, so the msstore winget source must be available.
-# On LTSC without the Store this will likely fail – a manual sideload is needed.
-Write-Step "Installing Xbox Game Bar from msstore..."
-winget install 9NZKPSTSNW4P --accept-source-agreements --silent 2>&1
-if ($LASTEXITCODE -ne 0) {
-    Write-Warn "Xbox Game Bar install failed - msstore source may not be available on LTSC."
-    Write-Warn "Sideload guide: https://github.com/microsoft/xbox-game-bar"
-}
+# # Game Bar is stripped from LTSC. It provides the gaming overlay (FPS counter,
+# # screen capture, performance widgets) and is required by some games/launchers.
+# # It lives in the MS Store, so the msstore winget source must be available.
+# # On LTSC without the Store this will likely fail – a manual sideload is needed.
+# Write-Step "Installing Xbox Game Bar from msstore..."
+# winget install 9NZKPSTSNW4P --accept-source-agreements --silent 2>&1
+# if ($LASTEXITCODE -ne 0) {
+#     Write-Warn "Xbox Game Bar install failed - msstore source may not be available on LTSC."
+#     Write-Warn "Sideload guide: https://github.com/microsoft/xbox-game-bar"
+# }
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Header "XNA Framework 4.0 Redistributable"
