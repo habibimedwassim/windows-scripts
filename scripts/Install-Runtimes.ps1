@@ -18,7 +18,7 @@ param(
 
 $ErrorActionPreference = 'Continue'
 
-function Write-Header { param($t) Write-Host "`n  ── $t ──" -ForegroundColor Magenta }
+function Write-Header { param($t) Write-Host "`n  -- $t --" -ForegroundColor Magenta }
 function Write-Step   { param($t) Write-Host "  >> $t"     -ForegroundColor Cyan }
 function Write-Ok     { param($t) Write-Host "  [OK] $t"   -ForegroundColor Green }
 function Write-Warn   { param($t) Write-Host "  [!] $t"    -ForegroundColor Yellow }
@@ -77,7 +77,7 @@ $result = dism /online /enable-feature /featurename:NetFx3 /all /norestart 2>&1
 if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 3010) {
     Write-Ok ".NET Framework 3.5 enabled (reboot may be required)."
 } else {
-    Write-Warn ".NET Framework 3.5 DISM exited with code $LASTEXITCODE – it may already be enabled."
+    Write-Warn ".NET Framework 3.5 DISM exited with code $LASTEXITCODE - it may already be enabled."
 }
 
 # ════════════════════════════════════════════════════════════════════════════════
@@ -111,7 +111,7 @@ Write-Header "Xbox Game Bar  (9NZKPSTSNW4P)"
 Write-Step "Installing Xbox Game Bar from msstore..."
 winget install 9NZKPSTSNW4P --accept-source-agreements --accept-package-agreements --silent 2>&1
 if ($LASTEXITCODE -ne 0) {
-    Write-Warn "Xbox Game Bar install failed – msstore source may not be available on LTSC."
+    Write-Warn "Xbox Game Bar install failed - msstore source may not be available on LTSC."
     Write-Warn "Sideload guide: https://github.com/microsoft/xbox-game-bar"
 }
 

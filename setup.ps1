@@ -31,17 +31,13 @@ $ErrorActionPreference = 'Stop'
 # cause Invoke-WebRequest / irm to fail when contacting GitHub.
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# ── Banner ────────────────────────────────────────────────────────────────────
+# ── Banner ───────────────────────────────────────────────────────────────────
 Clear-Host
 Write-Host ""
-Write-Host "  ██╗    ██╗██╗███╗   ██╗    ███████╗███████╗████████╗██╗   ██╗██████╗ " -ForegroundColor Cyan
-Write-Host "  ██║    ██║██║████╗  ██║    ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗" -ForegroundColor Cyan
-Write-Host "  ██║ █╗ ██║██║██╔██╗ ██║    ███████╗█████╗     ██║   ██║   ██║██████╔╝" -ForegroundColor Cyan
-Write-Host "  ██║███╗██║██║██║╚██╗██║    ╚════██║██╔══╝     ██║   ██║   ██║██╔═══╝ " -ForegroundColor Cyan
-Write-Host "  ╚███╔███╔╝██║██║ ╚████║    ███████║███████╗   ██║   ╚██████╔╝██║     " -ForegroundColor Cyan
-Write-Host "   ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝   ╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝     " -ForegroundColor Cyan
-Write-Host ""
-Write-Host "  Windows LTSC / Clean-Install Setup  ·  github.com/habibimedwassim/windows-scripts" -ForegroundColor DarkGray
+Write-Host "  ================================================" -ForegroundColor Cyan
+Write-Host "   Windows LTSC / Clean-Install Setup" -ForegroundColor Cyan
+Write-Host "   github.com/habibimedwassim/windows-scripts" -ForegroundColor Cyan
+Write-Host "  ================================================" -ForegroundColor Cyan
 Write-Host ""
 
 # ── Admin check (belt-and-suspenders on top of #Requires) ─────────────────────
@@ -81,7 +77,7 @@ function Get-Script {
 Write-Host ""
 Write-Host "  Enable Microsoft Store?" -ForegroundColor Yellow
 Write-Host "  Required for: Xbox Game Bar and other Store-only packages." -ForegroundColor DarkGray
-Write-Host "  (uses wsreset -i – pulls from the Windows Component Store, no ISO needed)" -ForegroundColor DarkGray
+Write-Host "  (uses wsreset -i - pulls from the Windows Component Store, no ISO needed)" -ForegroundColor DarkGray
 $storeChoice = Read-Host "  Install Store? [y/N]"
 if ($storeChoice -match '^[Yy]') {
     Write-Host "`n  >> Registering Microsoft Store via wsreset -i ..." -ForegroundColor Cyan
@@ -96,11 +92,11 @@ if ($storeChoice -match '^[Yy]') {
 # ── Menu ───────────────────────────────────────────────────────────────────────
 Write-Host "  What would you like to set up? (comma-separated, or 0 for everything)`n" -ForegroundColor Yellow
 Write-Host "    0  Full setup  (both steps below)"
-Write-Host "    1  Runtimes    – VCRedist, .NET, DirectX, WebView2, XNA, .NET Framework 3.5"
-Write-Host "    2  Tweaks      – Classic context menu, Explorer defaults, power plan, accessibility"
+Write-Host "    1  Runtimes    - VCRedist, .NET, DirectX, WebView2, XNA, .NET Framework 3.5"
+Write-Host "    2  Tweaks      - Classic context menu, Explorer defaults, power plan, accessibility"
 Write-Host ""
 Write-Host "  Note: PS7, Windows Terminal, eza and Starship are installed separately via" -ForegroundColor DarkGray
-Write-Host "        Install-Dev.ps1 – run that as your NORMAL USER after this script." -ForegroundColor DarkGray
+Write-Host "        Install-Dev.ps1 - run that as your NORMAL USER after this script." -ForegroundColor DarkGray
 Write-Host ""
 $raw     = Read-Host "  Choice"
 $choices = $raw -split ',' | ForEach-Object { $_.Trim() }
@@ -108,7 +104,7 @@ $doAll   = $choices -contains '0'
 
 # ── Step 0: Install winget if missing ─────────────────────────────────────────
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-    Write-Host "`n  winget not found – installing it first..." -ForegroundColor Yellow
+    Write-Host "`n  winget not found - installing it first..." -ForegroundColor Yellow
     & (Get-Script 'Install-Winget.ps1')
 
     # Refresh PATH
@@ -154,6 +150,6 @@ Write-Host "  Next step: open a NORMAL (non-admin) PowerShell window and run:" -
 Write-Host ""
 Write-Host "    .\scripts\Install-Dev.ps1" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  This installs PS7 (interactive – opt out of telemetry/WU updates)," -ForegroundColor DarkGray
+Write-Host "  This installs PS7 (interactive - opt out of telemetry/WU updates)," -ForegroundColor DarkGray
 Write-Host "  Windows Terminal, eza, Starship, and your PowerShell profile." -ForegroundColor DarkGray
 Write-Host ""

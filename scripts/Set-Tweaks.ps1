@@ -15,7 +15,7 @@
 
 $ErrorActionPreference = 'Continue'
 
-function Write-Header { param($t) Write-Host "`n  ── $t ──" -ForegroundColor Magenta }
+function Write-Header { param($t) Write-Host "`n  -- $t --" -ForegroundColor Magenta }
 function Write-Step   { param($t) Write-Host "  >> $t"     -ForegroundColor Cyan }
 function Write-Ok     { param($t) Write-Host "  [OK] $t"   -ForegroundColor Green }
 function Write-Warn   { param($t) Write-Host "  [!] $t"    -ForegroundColor Yellow }
@@ -24,7 +24,7 @@ function Write-Warn   { param($t) Write-Host "  [!] $t"    -ForegroundColor Yell
 function Ensure-Key { param($path) if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null } }
 
 # ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Context Menu – Restore Classic (Windows 10) Style"
+Write-Header "Context Menu - Restore Classic (Windows 10) Style"
 # ════════════════════════════════════════════════════════════════════════════════
 
 $ctxKey = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
@@ -64,7 +64,7 @@ foreach ($key in @($toggleFlags, $stickyFlags, $filterFlags)) {
 Write-Ok "Sticky / Filter / Toggle key prompts disabled."
 
 # ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Mouse – Disable Enhance Pointer Precision"
+Write-Header "Mouse - Disable Enhance Pointer Precision"
 # ════════════════════════════════════════════════════════════════════════════════
 
 # Mouse acceleration ruins consistent aim in games. These three values together
@@ -76,7 +76,7 @@ Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold2' -Value '0' -Type String
 Write-Ok "Mouse acceleration disabled."
 
 # ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Game DVR – Disable Background Recording"
+Write-Header "Game DVR - Disable Background Recording"
 # ════════════════════════════════════════════════════════════════════════════════
 
 # Xbox Game Bar background recording (Game DVR) consumes CPU and GPU even when
@@ -103,10 +103,10 @@ Write-Header "Hardware-Accelerated GPU Scheduling (HAGS)"
 $hagsKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
 Ensure-Key $hagsKey
 Set-ItemProperty -Path $hagsKey -Name 'HwSchMode' -Value 2 -Type DWord
-Write-Ok "Hardware-Accelerated GPU Scheduling enabled (takes effect after reboot)." – High Performance"
-# ════════════════════════════════════════════════════════════════════════════════
+Write-Ok "Hardware-Accelerated GPU Scheduling enabled (takes effect after reboot)."
 
-Write-Step "Activating High Performance power plan..."
+# ════════════════════════════════════════════════════════════════════════════════
+Write-Header "Power Plan - High Performance"
 $hp = powercfg /l | Select-String 'High performance'
 if ($hp) {
     $guid = ($hp -split '\s+')[3]
