@@ -25,29 +25,54 @@ function Write-Warn   { param($t) Write-Host "  [!] $t"    -ForegroundColor Yell
 # Helper – ensures a registry key exists before setting values under it
 function Ensure-Key { param($path) if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null } }
 
+# Helper – prompts [1] Apply / [2] Undo / [3] Skip and returns the choice
+function Get-TweakChoice {
+    param([string]$applyLabel, [string]$undoLabel)
+    Write-Host ""
+    Write-Host "  [1] $applyLabel" -ForegroundColor Cyan
+    Write-Host "  [2] $undoLabel"  -ForegroundColor Cyan
+    Write-Host "  [3] Skip"       -ForegroundColor Cyan
+    return (Read-Host "  Choose [1/2/3]")
+}
+
 # ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Context Menu - Restore Classic (Windows 10) Style"
+Write-Header "Context Menu - Classic (Windows 10) Style"
 # ════════════════════════════════════════════════════════════════════════════════
 
 $ctxKey = 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32'
-Ensure-Key $ctxKey
-# Setting the (Default) value to an empty string re-enables the classic menu
-Set-ItemProperty -Path $ctxKey -Name '(Default)' -Value '' -Type String
-Write-Ok "Classic context menu enabled. (Explorer restart required)"
+$choice = Get-TweakChoice 'Restore classic context menu' 'Undo (use Windows 11 menu)'
+switch ($choice) {
+    '1' {
+        Ensure-Key $ctxKey
+        Set-ItemProperty -Path $ctxKey -Name '(Default)' -Value '' -Type String
+        Write-Ok "Classic context menu enabled. (Explorer restart required)"
+    }
+    '2' {
+        if (Test-Path $ctxKey) { Remove-Item -Path $ctxKey -Recurse -Force }
+        Write-Ok "Windows 11 context menu restored. (Explorer restart required)"
+    }
+    default { Write-Step "Skipped." }
+}
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Header "File Explorer Defaults"
 # ════════════════════════════════════════════════════════════════════════════════
 
 $explorerAdv = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
-
-Write-Step "Show file extensions..."
-Set-ItemProperty -Path $explorerAdv -Name 'HideFileExt'           -Value 0 -Type DWord
-Write-Ok "Done."
-
-Write-Step "Show hidden files and folders..."
-Set-ItemProperty -Path $explorerAdv -Name 'Hidden' -Value 1 -Type DWord
-Write-Ok "Done."
+$choice = Get-TweakChoice 'Show file extensions + hidden files' 'Undo (hide extensions + hidden files)'
+switch ($choice) {
+    '1' {
+        Set-ItemProperty -Path $explorerAdv -Name 'HideFileExt' -Value 0 -Type DWord
+        Set-ItemProperty -Path $explorerAdv -Name 'Hidden'      -Value 1 -Type DWord
+        Write-Ok "File extensions visible, hidden files shown."
+    }
+    '2' {
+        Set-ItemProperty -Path $explorerAdv -Name 'HideFileExt' -Value 1 -Type DWord
+        Set-ItemProperty -Path $explorerAdv -Name 'Hidden'      -Value 2 -Type DWord
+        Write-Ok "File extensions hidden, hidden files hidden (Windows defaults)."
+    }
+    default { Write-Step "Skipped." }
+}
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Header "Keyboard / Accessibility Annoyances"
@@ -56,26 +81,46 @@ Write-Header "Keyboard / Accessibility Annoyances"
 $toggleFlags = 'HKCU:\Control Panel\Accessibility\ToggleKeys'
 $stickyFlags = 'HKCU:\Control Panel\Accessibility\StickyKeys'
 $filterFlags = 'HKCU:\Control Panel\Accessibility\Keyboard Response'
-
-# Bit 1 of Flags = HotKey enabled.  Clear it by setting to decimal value with bit 1 off.
-foreach ($key in @($toggleFlags, $stickyFlags, $filterFlags)) {
-    Ensure-Key $key
-    # Default flag value with hotkey disabled
-    Set-ItemProperty -Path $key -Name 'Flags' -Value '506' -Type String
+$choice = Get-TweakChoice 'Disable sticky/filter/toggle key prompts' 'Undo (re-enable key prompts)'
+switch ($choice) {
+    '1' {
+        foreach ($key in @($toggleFlags, $stickyFlags, $filterFlags)) {
+            Ensure-Key $key
+            Set-ItemProperty -Path $key -Name 'Flags' -Value '506' -Type String
+        }
+        Write-Ok "Sticky / Filter / Toggle key prompts disabled."
+    }
+    '2' {
+        foreach ($key in @($toggleFlags, $stickyFlags, $filterFlags)) {
+            Ensure-Key $key
+            Set-ItemProperty -Path $key -Name 'Flags' -Value '510' -Type String
+        }
+        Write-Ok "Sticky / Filter / Toggle key prompts re-enabled."
+    }
+    default { Write-Step "Skipped." }
 }
-Write-Ok "Sticky / Filter / Toggle key prompts disabled."
 
 # ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Mouse - Disable Enhance Pointer Precision"
+Write-Header "Mouse - Enhance Pointer Precision (Acceleration)"
 # ════════════════════════════════════════════════════════════════════════════════
 
-# Mouse acceleration ruins consistent aim in games. These three values together
-# fully disable Windows pointer acceleration ("Enhance pointer precision").
 $mouseKey = 'HKCU:\Control Panel\Mouse'
-Set-ItemProperty -Path $mouseKey -Name 'MouseSpeed'      -Value '0' -Type String
-Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold1' -Value '0' -Type String
-Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold2' -Value '0' -Type String
-Write-Ok "Mouse acceleration disabled."
+$choice = Get-TweakChoice 'Disable mouse acceleration' 'Undo (re-enable mouse acceleration)'
+switch ($choice) {
+    '1' {
+        Set-ItemProperty -Path $mouseKey -Name 'MouseSpeed'      -Value '0' -Type String
+        Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold1' -Value '0' -Type String
+        Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold2' -Value '0' -Type String
+        Write-Ok "Mouse acceleration disabled."
+    }
+    '2' {
+        Set-ItemProperty -Path $mouseKey -Name 'MouseSpeed'      -Value '1' -Type String
+        Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold1' -Value '6' -Type String
+        Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold2' -Value '10' -Type String
+        Write-Ok "Mouse acceleration re-enabled (Windows defaults)."
+    }
+    default { Write-Step "Skipped." }
+}
 
 # # ════════════════════════════════════════════════════════════════════════════════
 # Write-Header "Game DVR - Disable Background Recording"
