@@ -7,10 +7,10 @@
 #   3. Show hidden files and folders
 #   4. Disable sticky/filter/toggle keys prompts
 #   5. Disable mouse enhance pointer precision (acceleration)
-#   6. Disable Game DVR / background recording
-#   7. Disable Xbox Game Bar (suppresses ms-gamingoverlay popup)
-#   8. Enable Hardware-Accelerated GPU Scheduling (HAGS)
-#   9. Set power plan to High Performance
+#   6. Disable Game DVR / background recording          (commented out – may break recording features)
+#   7. Disable Xbox Game Bar (ms-gamingoverlay popup)     (commented out – modifies HKLM policies)
+#   8. Enable Hardware-Accelerated GPU Scheduling (HAGS)  (commented out – may cause issues on some GPUs)
+#   9. Set power plan to High Performance                 (commented out – aggressive for laptops)
 
 #Requires -RunAsAdministrator
 
@@ -76,78 +76,78 @@ Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold1' -Value '0' -Type String
 Set-ItemProperty -Path $mouseKey -Name 'MouseThreshold2' -Value '0' -Type String
 Write-Ok "Mouse acceleration disabled."
 
-# ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Game DVR - Disable Background Recording"
-# ════════════════════════════════════════════════════════════════════════════════
+# # ════════════════════════════════════════════════════════════════════════════════
+# Write-Header "Game DVR - Disable Background Recording"
+# # ════════════════════════════════════════════════════════════════════════════════
 
-# Xbox Game Bar background recording (Game DVR) consumes CPU and GPU even when
-# you are not actively recording. Disable it for a clean baseline.
-$gameDVRUser = 'HKCU:\System\GameConfigStore'
-Ensure-Key $gameDVRUser
-Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_Enabled'              -Value 0 -Type DWord
-Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_FSEBehaviorMode'      -Value 2 -Type DWord
-Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_HonorUserFSEBehavior' -Value 1 -Type DWord
+# # Xbox Game Bar background recording (Game DVR) consumes CPU and GPU even when
+# # you are not actively recording. Disable it for a clean baseline.
+# $gameDVRUser = 'HKCU:\System\GameConfigStore'
+# Ensure-Key $gameDVRUser
+# Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_Enabled'              -Value 0 -Type DWord
+# Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_FSEBehaviorMode'      -Value 2 -Type DWord
+# Set-ItemProperty -Path $gameDVRUser -Name 'GameDVR_HonorUserFSEBehavior' -Value 1 -Type DWord
 
-$gameDVRCapture = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR'
-Ensure-Key $gameDVRCapture
-Set-ItemProperty -Path $gameDVRCapture -Name 'AppCaptureEnabled' -Value 0 -Type DWord
+# $gameDVRCapture = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR'
+# Ensure-Key $gameDVRCapture
+# Set-ItemProperty -Path $gameDVRCapture -Name 'AppCaptureEnabled' -Value 0 -Type DWord
 
-$gameDVRPolicy = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR'
-Ensure-Key $gameDVRPolicy
-Set-ItemProperty -Path $gameDVRPolicy -Name 'AllowGameDVR' -Value 0 -Type DWord
-Write-Ok "Game DVR background recording disabled."
+# $gameDVRPolicy = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR'
+# Ensure-Key $gameDVRPolicy
+# Set-ItemProperty -Path $gameDVRPolicy -Name 'AllowGameDVR' -Value 0 -Type DWord
+# Write-Ok "Game DVR background recording disabled."
 
-# ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Xbox Game Bar - Disable (suppress ms-gamingoverlay popup)"
-# ════════════════════════════════════════════════════════════════════════════════
+# # ════════════════════════════════════════════════════════════════════════════════
+# Write-Header "Xbox Game Bar - Disable (suppress ms-gamingoverlay popup)"
+# # ════════════════════════════════════════════════════════════════════════════════
 
-# When Xbox Game Bar is not installed, Windows still tries to launch it via the
-# ms-gamingoverlay URI scheme (triggered by Win+G or game start hooks), causing
-# an annoying "Try the new Xbox app" popup.  Disabling these registry keys
-# prevents the popup from appearing entirely.
-$gameBarKey = 'HKCU:\Software\Microsoft\GameBar'
-Ensure-Key $gameBarKey
-Set-ItemProperty -Path $gameBarKey -Name 'ShowStartupPanel'    -Value 0 -Type DWord
-Set-ItemProperty -Path $gameBarKey -Name 'AutoGameModeEnabled'  -Value 0 -Type DWord
-Set-ItemProperty -Path $gameBarKey -Name 'AllowAutoGameMode'    -Value 0 -Type DWord
+# # When Xbox Game Bar is not installed, Windows still tries to launch it via the
+# # ms-gamingoverlay URI scheme (triggered by Win+G or game start hooks), causing
+# # an annoying "Try the new Xbox app" popup.  Disabling these registry keys
+# # prevents the popup from appearing entirely.
+# $gameBarKey = 'HKCU:\Software\Microsoft\GameBar'
+# Ensure-Key $gameBarKey
+# Set-ItemProperty -Path $gameBarKey -Name 'ShowStartupPanel'    -Value 0 -Type DWord
+# Set-ItemProperty -Path $gameBarKey -Name 'AutoGameModeEnabled'  -Value 0 -Type DWord
+# Set-ItemProperty -Path $gameBarKey -Name 'AllowAutoGameMode'    -Value 0 -Type DWord
 
-# Also block the Game Bar via policy (machine-wide)
-$gameBarPolicy = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR'
-Ensure-Key $gameBarPolicy
-Set-ItemProperty -Path $gameBarPolicy -Name 'AllowGameDVR' -Value 0 -Type DWord
+# # Also block the Game Bar via policy (machine-wide)
+# $gameBarPolicy = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR'
+# Ensure-Key $gameBarPolicy
+# Set-ItemProperty -Path $gameBarPolicy -Name 'AllowGameDVR' -Value 0 -Type DWord
 
-Write-Ok "Xbox Game Bar disabled (ms-gamingoverlay popup suppressed)."
+# Write-Ok "Xbox Game Bar disabled (ms-gamingoverlay popup suppressed)."
 
-# ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Hardware-Accelerated GPU Scheduling (HAGS)"
-# ════════════════════════════════════════════════════════════════════════════════
+# # ════════════════════════════════════════════════════════════════════════════════
+# Write-Header "Hardware-Accelerated GPU Scheduling (HAGS)"
+# # ════════════════════════════════════════════════════════════════════════════════
 
-# HAGS lets the GPU manage its own memory scheduling instead of the CPU,
-# reducing frametime variance. Supported on GTX 1000+ / RX 5000+ with up-to-date
-# drivers. Safe to enable on unsupported hardware (setting is silently ignored).
-$hagsKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
-Ensure-Key $hagsKey
-Set-ItemProperty -Path $hagsKey -Name 'HwSchMode' -Value 2 -Type DWord
-Write-Ok "Hardware-Accelerated GPU Scheduling enabled (takes effect after reboot)."
+# # HAGS lets the GPU manage its own memory scheduling instead of the CPU,
+# # reducing frametime variance. Supported on GTX 1000+ / RX 5000+ with up-to-date
+# # drivers. Safe to enable on unsupported hardware (setting is silently ignored).
+# $hagsKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
+# Ensure-Key $hagsKey
+# Set-ItemProperty -Path $hagsKey -Name 'HwSchMode' -Value 2 -Type DWord
+# Write-Ok "Hardware-Accelerated GPU Scheduling enabled (takes effect after reboot)."
 
-# ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Power Plan - High Performance"
-$hp = powercfg /l | Select-String 'High performance'
-if ($hp) {
-    $guid = ($hp -split '\s+')[3]
-    powercfg /setactive $guid
-    Write-Ok "High Performance plan active ($guid)."
-} else {
-    # On some editions the plan isn't listed – duplicate the Balanced plan
-    Write-Warn "High Performance plan not found; duplicating Balanced..."
-    powercfg /duplicatescheme 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c | Out-Null
-    $hp2 = powercfg /l | Select-String 'High performance'
-    if ($hp2) {
-        $guid2 = ($hp2 -split '\s+')[3]
-        powercfg /setactive $guid2
-        Write-Ok "High Performance plan created and activated."
-    }
-}
+# # ════════════════════════════════════════════════════════════════════════════════
+# Write-Header "Power Plan - High Performance"
+# $hp = powercfg /l | Select-String 'High performance'
+# if ($hp) {
+#     $guid = ($hp -split '\s+')[3]
+#     powercfg /setactive $guid
+#     Write-Ok "High Performance plan active ($guid)."
+# } else {
+#     # On some editions the plan isn't listed – duplicate the Balanced plan
+#     Write-Warn "High Performance plan not found; duplicating Balanced..."
+#     powercfg /duplicatescheme 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c | Out-Null
+#     $hp2 = powercfg /l | Select-String 'High performance'
+#     if ($hp2) {
+#         $guid2 = ($hp2 -split '\s+')[3]
+#         powercfg /setactive $guid2
+#         Write-Ok "High Performance plan created and activated."
+#     }
+# }
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Header "Restart Explorer to Apply Visual Changes"
