@@ -156,9 +156,18 @@ Write-Header "Windows Photo Viewer"
 
 # The classic Windows Photo Viewer is still present in Windows 10/11 but hidden.
 # A .reg file import is the most reliable way to restore (or undo) it.
-$regDir = Join-Path $PSScriptRoot '..\profile'
-$regRestore = Join-Path $regDir 'windows_photo_viewer.reg'
-$regUndo    = Join-Path $regDir 'windows_photo_viewer_undo.reg'
+$repoBase   = 'https://raw.githubusercontent.com/habibimedwassim/windows-scripts/main'
+$localProfile = Join-Path $PSScriptRoot '..\profile'
+
+function Get-RegFile {
+    param([string]$name)
+    $local = Join-Path $localProfile $name
+    if (Test-Path $local) { return $local }
+    # Running from web – download to temp
+    $tmp = Join-Path $env:TEMP $name
+    Invoke-WebRequest "$repoBase/profile/$name" -OutFile $tmp -UseBasicParsing
+    return $tmp
+}
 
 Write-Host ""
 Write-Host "  [1] Restore Windows Photo Viewer" -ForegroundColor Cyan
@@ -168,19 +177,21 @@ $pvChoice = Read-Host "  Choose [1/2/3]"
 
 switch ($pvChoice) {
     '1' {
-        if (Test-Path $regRestore) {
+        try {
+            $regRestore = Get-RegFile 'windows_photo_viewer.reg'
             reg import "$regRestore" 2>$null
             Write-Ok "Windows Photo Viewer restored. Set it as default in Settings > Default Apps."
-        } else {
-            Write-Warn "Reg file not found: $regRestore"
+        } catch {
+            Write-Warn "Failed to get reg file: $_"
         }
     }
     '2' {
-        if (Test-Path $regUndo) {
+        try {
+            $regUndo = Get-RegFile 'windows_photo_viewer_undo.reg'
             reg import "$regUndo" 2>$null
             Write-Ok "Windows Photo Viewer associations removed."
-        } else {
-            Write-Warn "Reg file not found: $regUndo"
+        } catch {
+            Write-Warn "Failed to get reg file: $_"
         }
     }
     default { Write-Step "Skipped." }
