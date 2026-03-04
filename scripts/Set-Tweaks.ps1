@@ -11,7 +11,7 @@
 #   7. Disable Xbox Game Bar (ms-gamingoverlay popup)     (commented out – modifies HKLM policies)
 #   8. Enable Hardware-Accelerated GPU Scheduling (HAGS)  (commented out – may cause issues on some GPUs)
 #   9. Set power plan to High Performance                 (commented out – aggressive for laptops)
-#  10. Restore classic Windows Photo Viewer for image files
+#  10. Restore / undo classic Windows Photo Viewer (prompted)
 
 #Requires -RunAsAdministrator
 
@@ -151,21 +151,40 @@ Write-Ok "Mouse acceleration disabled."
 # }
 
 # ════════════════════════════════════════════════════════════════════════════════
-Write-Header "Restore Classic Windows Photo Viewer"
+Write-Header "Windows Photo Viewer"
 # ════════════════════════════════════════════════════════════════════════════════
 
 # The classic Windows Photo Viewer is still present in Windows 10/11 but hidden.
-# Re-registering the file associations under HKCU makes it available as an
-# "Open with" option (and as a default-app choice) for common image formats.
-$photoViewerDll = '%SystemRoot%\System32\rundll32.exe "%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll", ImageView_Fullscreen %1'
-$extensions = @('.jpg','.jpeg','.png','.bmp','.gif','.tif','.tiff','.ico')
+# A .reg file import is the most reliable way to restore (or undo) it.
+$regDir = Join-Path $PSScriptRoot '..\profile'
+$regRestore = Join-Path $regDir 'windows_photo_viewer.reg'
+$regUndo    = Join-Path $regDir 'windows_photo_viewer_undo.reg'
 
-foreach ($ext in $extensions) {
-    $cmdKey = "HKCU:\Software\Classes\$ext\shell\open\command"
-    Ensure-Key $cmdKey
-    Set-ItemProperty -Path $cmdKey -Name '(Default)' -Value $photoViewerDll
+Write-Host ""
+Write-Host "  [1] Restore Windows Photo Viewer" -ForegroundColor Cyan
+Write-Host "  [2] Undo   (remove Photo Viewer associations)" -ForegroundColor Cyan
+Write-Host "  [3] Skip" -ForegroundColor Cyan
+$pvChoice = Read-Host "  Choose [1/2/3]"
+
+switch ($pvChoice) {
+    '1' {
+        if (Test-Path $regRestore) {
+            reg import "$regRestore" 2>$null
+            Write-Ok "Windows Photo Viewer restored. Set it as default in Settings > Default Apps."
+        } else {
+            Write-Warn "Reg file not found: $regRestore"
+        }
+    }
+    '2' {
+        if (Test-Path $regUndo) {
+            reg import "$regUndo" 2>$null
+            Write-Ok "Windows Photo Viewer associations removed."
+        } else {
+            Write-Warn "Reg file not found: $regUndo"
+        }
+    }
+    default { Write-Step "Skipped." }
 }
-Write-Ok "Windows Photo Viewer re-enabled for: $($extensions -join ', ')"
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Header "Restart Explorer to Apply Visual Changes"
