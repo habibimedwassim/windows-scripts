@@ -109,6 +109,7 @@ if ($isAdmin) {
     Write-Host "    - Show hidden files"
     Write-Host "    - Disable accessibility hotkeys"
     Write-Host "    - Disable mouse acceleration"
+    Write-Host "    - Restore Windows Photo Viewer (optional, prompted)"
     Write-Host ""
 
     $confirm = Read-Host "  Proceed? (Y/N)"

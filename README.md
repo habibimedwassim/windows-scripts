@@ -10,7 +10,7 @@ A collection of PowerShell scripts to fully set up a fresh Windows LTSC (or any 
 |------|--------|--------|-------------|
 | 0 | `Install-Winget.ps1` | Admin | Installs winget from GitHub (no Store needed) |
 | 1 | `Install-Runtimes.ps1` | Admin | VCRedist, .NET, DirectX, WebView2, XNA, 7-Zip, codecs |
-| 2 | `Set-Tweaks.ps1` | Admin | Classic context menu, Explorer defaults, accessibility |
+| 2 | `Set-Tweaks.ps1` | Admin | Classic context menu, Explorer defaults, accessibility, Photo Viewer |
 | 3 | `Install-Dev.ps1` | **User** | PS7 (interactive), Terminal, eza, Starship, PS profile |
 
 ---
@@ -65,6 +65,7 @@ Tweaks:
   - Show hidden files
   - Disable accessibility hotkeys
   - Disable mouse acceleration
+  - Restore Windows Photo Viewer (optional, prompted)
 ```
 
 **As Normal User** — shows the dev/shell tools and asks **Y/N**:
@@ -132,12 +133,19 @@ Registry and system tweaks (requires Admin):
 - Show hidden files and folders
 - Disable Sticky / Filter / Toggle key prompts
 - Disable mouse enhance pointer precision (acceleration)
+- **Windows Photo Viewer** — prompts to restore the classic image viewer or undo the change (imports `profile/windows_photo_viewer.reg` / `windows_photo_viewer_undo.reg`)
 
 ---
 
 ### `profile/Microsoft.PowerShell_profile.ps1`
 
-Configures `eza`-based `ls` aliases and initialises the Starship prompt.  
+Configures `eza`-based `ls` aliases and initialises the Starship prompt.
+
+---
+
+### `profile/windows_photo_viewer.reg` / `windows_photo_viewer_undo.reg`
+
+Registry files that restore (or remove) the classic **Windows Photo Viewer** on Windows 10/11. Imported automatically by `Set-Tweaks.ps1` when the user chooses the Photo Viewer option. Can also be double-clicked manually.  
 Installed automatically by `Install-Dev.ps1`, or copy it manually to:
 
 ```
