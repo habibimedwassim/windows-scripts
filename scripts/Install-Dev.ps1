@@ -2,26 +2,13 @@
 # Installs the base shell environment: PowerShell 7, Windows Terminal, eza, Starship,
 # and deploys the PowerShell profile.
 #
-# !! Run this as your NORMAL USER – NOT as Administrator !!
-#    These tools install per-user by default when not elevated, which is correct.
-#    Running as admin installs them machine-wide and can cause path/permission quirks.
-#
-# You are expected to still be on Windows PowerShell 5.1 (the LTSC inbox shell)
-# when you run this. PS7 will be available after reopening the terminal.
+# Intended to run as your NORMAL USER – not as Administrator.
+# These tools install per-user by default when not elevated, which is correct.
+# Running as admin installs them machine-wide and can cause path/permission quirks.
 
 #Requires -Version 5.1
 
 $ErrorActionPreference = 'Continue'
-
-# Refuse to continue if elevated
-if (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-    ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Host ""
-    Write-Host "  [!] Do not run this script as Administrator." -ForegroundColor Yellow
-    Write-Host "      Close this elevated shell and run it from a normal PowerShell window." -ForegroundColor Yellow
-    Write-Host ""
-    exit 1
-}
 
 function Write-Header { param($t) Write-Host "`n  -- $t --" -ForegroundColor Magenta }
 function Write-Step   { param($t) Write-Host "  >> $t"      -ForegroundColor Cyan }
