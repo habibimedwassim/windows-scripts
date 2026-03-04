@@ -9,6 +9,8 @@
 #   - OpenAL
 #   - XNA Framework 4.0 Redistributable
 #   - Xbox Game Bar (Store-only, skipped if msstore source unavailable)
+#   - 7-Zip
+#   - K-Lite Codec Pack Standard
 
 param(
     [switch]$Quiet   # pass -Quiet to suppress individual winget progress bars
@@ -98,7 +100,7 @@ Write-Header "OpenAL"
 # ════════════════════════════════════════════════════════════════════════════════
 
 # Required by many games: Source engine titles, id Tech games, Unity games, etc.
-wgi 'OpenAL.OpenAL'
+wgi 'CreativeTechnology.OpenAL'
 
 # # ════════════════════════════════════════════════════════════════════════════════
 # Write-Header "Xbox Game Bar  (9NZKPSTSNW4P)"
@@ -122,6 +124,20 @@ Write-Header "XNA Framework 4.0 Redistributable"
 # Required by older indie games (Terraria legacy, Stardew Valley pre-1.6, etc.)
 Write-Step "Installing XNA Framework 4.0..."
 winget install --exact --id Microsoft.XNARedist --accept-package-agreements --accept-source-agreements --silent
+
+# ════════════════════════════════════════════════════════════════════════════════
+
+# ════════════════════════════════════════════════════════════════════════════════
+Write-Header "7-Zip"
+# ════════════════════════════════════════════════════════════════════════════════
+
+wgi '7zip.7zip'
+
+# ════════════════════════════════════════════════════════════════════════════════
+Write-Header "Codecs"
+# ════════════════════════════════════════════════════════════════════════════════
+
+wgi 'CodecGuide.K-LiteCodecPack.Standard'
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Host ""
