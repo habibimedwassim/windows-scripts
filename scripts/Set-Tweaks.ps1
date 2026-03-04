@@ -11,6 +11,7 @@
 #   7. Disable Xbox Game Bar (ms-gamingoverlay popup)     (commented out – modifies HKLM policies)
 #   8. Enable Hardware-Accelerated GPU Scheduling (HAGS)  (commented out – may cause issues on some GPUs)
 #   9. Set power plan to High Performance                 (commented out – aggressive for laptops)
+#  10. Restore classic Windows Photo Viewer for image files
 
 #Requires -RunAsAdministrator
 
@@ -148,6 +149,23 @@ Write-Ok "Mouse acceleration disabled."
 #         Write-Ok "High Performance plan created and activated."
 #     }
 # }
+
+# ════════════════════════════════════════════════════════════════════════════════
+Write-Header "Restore Classic Windows Photo Viewer"
+# ════════════════════════════════════════════════════════════════════════════════
+
+# The classic Windows Photo Viewer is still present in Windows 10/11 but hidden.
+# Re-registering the file associations under HKCU makes it available as an
+# "Open with" option (and as a default-app choice) for common image formats.
+$photoViewerDll = '%SystemRoot%\System32\rundll32.exe "%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll", ImageView_Fullscreen %1'
+$extensions = @('.jpg','.jpeg','.png','.bmp','.gif','.tif','.tiff','.ico')
+
+foreach ($ext in $extensions) {
+    $cmdKey = "HKCU:\Software\Classes\$ext\shell\open\command"
+    Ensure-Key $cmdKey
+    Set-ItemProperty -Path $cmdKey -Name '(Default)' -Value $photoViewerDll
+}
+Write-Ok "Windows Photo Viewer re-enabled for: $($extensions -join ', ')"
 
 # ════════════════════════════════════════════════════════════════════════════════
 Write-Header "Restart Explorer to Apply Visual Changes"
